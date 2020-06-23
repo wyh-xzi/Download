@@ -1,0 +1,115 @@
+;/*++
+;
+;Copyright (c) Microsoft Corporation.  All rights reserved.
+;
+;   THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
+;   KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+;   IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
+;   PURPOSE.
+;
+;Module Name:
+;
+;    USBSamp.INF
+;
+;Abstract:
+;    Installation inf for the Intel 82930 USB Test Board
+;
+;--*/
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=ZFUSBProgrammer
+ClassGuid={78A25341-4539-11d3-B88D-00C04FAD5172}
+Provider=%MSFT%
+DriverVer=10/08/2012,6.1.7600.16386
+CatalogFile=ZFUSBProgrammer.cat
+
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=ZFUSBProgrammerClassReg     
+
+[ZFUSBProgrammerClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+; ================= Device section =====================
+
+[Manufacturer]
+%MfgName%=Microsoft,NTAMD64
+
+; For Win2K
+[Microsoft]
+%USB\VID_FFF0&PID_FFF1.DeviceDesc%=ZFUSBProgrammer.Dev, USB\VID_FFF0&PID_FFF1    
+
+; For XP and later
+[Microsoft.NTAMD64]
+%USB\VID_FFF0&PID_FFF1.DeviceDesc%=ZFUSBProgrammer.Dev, USB\VID_FFF0&PID_FFF1    
+
+
+[ZFUSBProgrammer.Dev.NT]
+CopyFiles=ZFUSBProgrammer.Files.Ext
+
+[ZFUSBProgrammer.Dev.NT.Services]
+Addservice = ZFUSBProgrammer, 0x00000002, ZFUSBProgrammer.AddService
+
+[ZFUSBProgrammer.AddService]
+DisplayName    = %ZFUSBProgrammer.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %10%\System32\Drivers\ZFUSBProgrammer.sys
+AddReg         = ZFUSBProgrammer.AddReg
+LoadOrderGroup = Base
+
+[ZFUSBProgrammer.AddReg]
+HKR,"Parameters","MaximumTransferSize",0x10001,65536
+HKR,"Parameters","DebugLevel",0x10001,2
+
+[ZFUSBProgrammer.Files.Ext]
+ZFUSBProgrammer.sys
+
+[SourceDisksNames]
+1=%Disk_Description%,,,
+
+[SourceDisksFiles]
+ZFUSBProgrammer.sys = 1
+
+;-------------- WDF Coinstaller installation
+[DestinationDirs]
+CoInstaller_CopyFiles = 11
+
+[ZFUSBProgrammer.Dev.NT.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+[CoInstaller_CopyFiles]
+WdfCoInstaller01009.dll
+
+[SourceDisksFiles]
+WdfCoInstaller01009.dll=1 ; make sure the number matches with SourceDisksNames
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[ZFUSBProgrammer.Dev.NT.Wdf]
+KmdfService = ZFUSBProgrammer, ZFUSBProgrammer_wdfsect
+
+[ZFUSBProgrammer_wdfsect]
+KmdfLibraryVersion = 1.9
+
+;---------------------------------------------------------------;
+
+[Strings]
+MSFT            = "Microsoft"
+MfgName         = "ZFUSBProgrammer"
+Disk_Description= "ZFUSBProgrammer Installation Disk"
+ZFUSBProgrammer.SvcDesc = "Driver for ZFUSBProgrammer"
+ClassName       = "ZFUSBProgrammer Device"
+USB\VID_FFF0&PID_FFF1.DeviceDesc="ZFUSBProgrammer Device"
+
+
