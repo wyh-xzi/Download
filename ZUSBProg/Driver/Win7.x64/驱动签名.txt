@@ -1,0 +1,11 @@
+1.把证书添加到本机
+CertMgr -add zyx.cer -s -r localMachine root
+
+//2.用证书签名文件
+//signtool.exe sign /v /s PrivateCertStore /n zyx.cn /t http://timestamp.verisign.com/scripts/timestamp.dll ZFUSBProgrammer.SYS
+
+3：关闭UAC，用bcdedit打开驱动测试模式
+bcdedit.exe -set loadoptions DDISABLE_INTEGRITY_CHECKS
+bcdedit.exe -set TESTSIGNING ON
+
+
